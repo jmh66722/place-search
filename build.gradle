@@ -1,0 +1,64 @@
+buildscript {
+    ext {
+        springBootVersion = '2.6.4'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.11.RELEASE"
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group 'org.example'
+sourceCompatibility = '11'
+
+//application.yml 리소스 파일에 프로퍼티값 주입
+processResources {
+    filesMatching('**/application.yml') {
+        expand(project.properties)
+    }
+}
+
+//  jar 로 떨굴때 최상위 모듈의 build/ 디렉토리로
+bootJar{
+    destinationDirectory = file(rootProject.buildDir)
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies{
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.springframework.boot:spring-boot-starter-aop"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    // H2
+    implementation "com.h2database:h2"
+
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
+
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}
