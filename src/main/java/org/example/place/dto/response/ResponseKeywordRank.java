@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 @ToString
 @Schema
-public class ResponseGetKeywordStatistics {
+public class ResponseKeywordRank {
 
     @Schema(description = "키워드")
     private String keyword;

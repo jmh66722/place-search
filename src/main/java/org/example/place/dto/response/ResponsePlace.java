@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 @ToString
 @Schema
-public class ResponseSearchPlaces {
+public class ResponsePlace {
 
     @Schema(description = "장소명")
     private String title;

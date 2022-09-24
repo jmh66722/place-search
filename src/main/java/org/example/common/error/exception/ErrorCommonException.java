@@ -1,7 +1,7 @@
 package org.example.common.error.exception;
 
 
-import org.example.common.error.ErrorCode;
+import org.example.common.dto.ErrorCode;
 
 public class ErrorCommonException extends RuntimeException {
     private ErrorCode code;

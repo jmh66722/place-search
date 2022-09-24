@@ -2,9 +2,8 @@ package org.example.place.service.v1;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.example.place.dto.response.ResponseGetKeywordStatistics;
-import org.example.place.dto.response.ResponseSearchPlaces;
-import org.example.place.repository.KeywordStatisticsRepository;
+import org.example.place.dto.response.ResponsePlace;
+import org.example.place.repository.SearchPlaceRepository;
 import org.example.place.service.PlaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,16 +17,13 @@ import java.util.List;
 public class PlaceServiceImpl implements PlaceService {
 
     @Autowired
-    private KeywordStatisticsRepository repository;
+    private SearchPlaceRepository searchPlaceRepository;
 
     @SneakyThrows
-    public List<ResponseSearchPlaces> getPlacesByKeyword(String keyword) {
+    public List<ResponsePlace> getPlacesByKeyword(String keyword) {
+        searchPlaceRepository.increaseCount(keyword);
+
         return new ArrayList<>();
-    }
-
-    @SneakyThrows
-    public List<ResponseGetKeywordStatistics> getKeywordStatistics() {
-        return repository.findDtoByLimitNumber(10);
     }
 
 }

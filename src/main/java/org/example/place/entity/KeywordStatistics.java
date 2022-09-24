@@ -26,9 +26,17 @@ public class KeywordStatistics {
     @Column(name = "KEYWORD", nullable = false)
     private String keyword;
 
-    @Column(name = "SEARCH_COUNT", nullable = false)
     @ColumnDefault("0")
-    private Integer searchCount;
+    @Column(name = "TOTAL_COUNT", nullable = false)
+    private Integer totalCount;
+
+    @ColumnDefault("0")
+    @Column(name = "DAY_COUNT", nullable = false)
+    private Integer dayCount;
+
+    @ColumnDefault("0")
+    @Column(name = "HOUR_COUNT", nullable = false)
+    private Integer hourCount;
 
     @LastModifiedDate
     @Column(name = "MODIFIED_AT", nullable = false)

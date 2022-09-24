@@ -43,7 +43,6 @@ spring:
       enabled: true
       path: /h2-console
 
-
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS}|%clr(%-5level)|%clr(%F){cyan}:%L|%clr(%logger{0}){blue}|%clr(%M){magenta}|%msg%n"
