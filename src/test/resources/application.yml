@@ -15,3 +15,16 @@ logging:
     root: info
     org.example.advice.*: debug
     org.example.service.*: debug
+
+kakao:
+  api:
+    host: https://dapi.kakao.com
+    key: KakaoAK 87b8f9ebad706807ff485be92f3f147c
+    timeout: 10000
+
+naver:
+  api:
+    host: https://openapi.naver.com
+    id: O7dzJxdO1uWlqDjUw4On
+    secret: 3nV4Pe6oFS
+    timeout: 10000

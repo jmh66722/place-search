@@ -6,11 +6,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import org.example.common.dto.response.CommonApiResponse;
 import org.example.common.dto.response.ErrorResponse;
 import org.example.common.dto.response.SingleResponse;
-import org.example.place.service.v1.PlaceServiceImpl;
+import org.example.place.service.PlaceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,10 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "v1")
-@RequiredArgsConstructor
 public class PlaceController {
 
-    private final PlaceServiceImpl service;
+    private final PlaceService service;
+
+    @Autowired
+    public PlaceController(PlaceService service) {
+        this.service = service;
+    }
 
 
     @GetMapping("places")

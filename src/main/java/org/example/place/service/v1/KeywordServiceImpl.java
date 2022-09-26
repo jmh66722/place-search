@@ -2,10 +2,11 @@ package org.example.place.service.v1;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.example.place.dto.response.ResponseKeywordRank;
+import org.example.place.dto.response.ResponseKeyword;
 import org.example.place.repository.KeywordStatisticsRepository;
 import org.example.place.service.KeywordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,12 +16,16 @@ import java.util.List;
 @Service
 public class KeywordServiceImpl implements KeywordService {
 
+    private final KeywordStatisticsRepository repository;
+
     @Autowired
-    private KeywordStatisticsRepository repository;
+    public KeywordServiceImpl(KeywordStatisticsRepository repository) {
+        this.repository = repository;
+    }
 
     @SneakyThrows
-    public List<ResponseKeywordRank> getKeywordsRank(int limit) {
-        return repository.findDtoTop(limit);
+    public List<ResponseKeyword> getPopularKeywords() {
+        return repository.findDtoByPage(PageRequest.of(0,10));
     }
 
 }

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 public class CommonErrorController implements ErrorController {
+
     @RequestMapping("/error")
     public void error(HttpServletRequest request) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);

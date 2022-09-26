@@ -11,11 +11,11 @@ import lombok.*;
 @Builder
 @ToString
 @Schema
-public class ResponseKeywordRank {
+public class ResponseKeyword {
 
     @Schema(description = "키워드")
     private String keyword;
 
     @Schema(description = "키워드 검색 횟수")
-    private Integer count;
+    private Integer totalCount;
 }
