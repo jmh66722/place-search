@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @SpringBootTest(classes = NaverApi.class)
@@ -19,7 +17,6 @@ class NaverApiTest {
 
     @Test
     void getLocalByKeyword_test() {
-        Map result1 = naverApi.getLocalByKeyword("은행", HashMap.class);
         ResponsePlaceOpenApi result = naverApi.getLocalByKeyword("은행", ResponsePlaceOpenApi.class);
         Assertions.assertNotNull(result);
 

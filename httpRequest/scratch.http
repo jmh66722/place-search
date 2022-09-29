@@ -1,0 +1,11 @@
+# curl -X GET --location "http://localhost:8080/v1/places?query=은행"
+#    -H "Accept: application/json"
+GET http://localhost:8080/v1/places?query=은행
+Accept: application/json
+
+###
+
+# curl -X GET --location "http://localhost:8080/v1/keywords/popular"
+#    -H "Accept: application/json"
+GET http://localhost:8080/v1/keywords/popular
+Accept: application/json

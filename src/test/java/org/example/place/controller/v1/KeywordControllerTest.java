@@ -30,20 +30,19 @@ class KeywordControllerTest {
     @Test
     void getPopularKeywords_test() throws Exception {
         ResultActions resultActions = mockMvc.perform(
-                        get(BASE_API_PATH+"/places")
+                        get(BASE_API_PATH+"/keywords/popular")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .queryParam("query","카페")
                 );
                 resultActions
                         .andDo(print())
                         .andExpect(status().isOk())
                         .andExpect(handler().handlerType(HandlerClass))
-                        .andExpect(handler().methodName("getPlacesByKeyword"))
+                        .andExpect(handler().methodName("getPopularKeywords"))
                         .andExpect(jsonPath("$.result").value(true))
                         .andExpect(jsonPath("$.status").value(200))
                         .andExpect(jsonPath("$.data").isArray())
-                        .andExpect(jsonPath("$.data[*].title").exists())
-                        .andExpect(jsonPath("$.data[*].address").exists())
+                        .andExpect(jsonPath("$.data[*].keyword").exists())
+                        .andExpect(jsonPath("$.data[*].totalCount").exists())
                 ;
     }
 }

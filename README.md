@@ -16,7 +16,7 @@
   ~~~
   ./gradlew bootJar
   ~~~
-  빌드가 완료되면 `build/plcae.jar` 파일이 생성됩니다.
+  빌드가 완료되면 `build/plcae-search.jar` 파일이 생성됩니다.
 
 ## Run   
 
@@ -26,10 +26,10 @@
   ~~~
 - jar run
 
-  `bootJar` 로 빌드후에 `build/plcae.jar` 를 실행합니다.
+  `bootJar` 로 빌드후에 `build/plcae-search.jar` 를 실행합니다.
 
   ~~~
-  java -jar ./build/place-search.jar
+  java -jar {프로젝트 루트 경로}/build/place-search.jar
   ~~~
 
 ## Test
@@ -39,10 +39,13 @@
   ./gradlew test
   ~~~
 
-- gURL test
-  ~~~
+## cURL Test
+- Swagger
+  API 문서화 경로 `/swagger-ui` 로 이동하면 Request 테스트를 해볼 수 있습니다.
 
-  ~~~
+- HttpRequest File Test
+  `{프로젝트 루트 경로}/httpRequest` 에 `scratch.http` 파일이 있습니다.
+  해당 파일의 cURL을 이용해 테스트 해 볼 수 있으며, Intellij IDE 를 사용한다면 IDE에서 파일을 열어 테스트 해볼 수 있습니다.
 
 
 ## 프로젝트 구조

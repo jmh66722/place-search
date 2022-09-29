@@ -11,11 +11,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
 @AutoConfigureTestDatabase
@@ -35,19 +33,20 @@ class PlaceControllerTest {
     @Test
     void getPlacesByKeyword_test() throws Exception {
         ResultActions resultActions = mockMvc.perform(
-                        get(BASE_API_PATH+"/keywords/popular")
+                        get(BASE_API_PATH+"/places")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .queryParam("query","카페")
                 );
                 resultActions
                         .andDo(print())
                         .andExpect(status().isOk())
                         .andExpect(handler().handlerType(HandlerClass))
-                        .andExpect(handler().methodName("getPopularKeywords"))
+                        .andExpect(handler().methodName("getPlacesByKeyword"))
                         .andExpect(jsonPath("$.result").value(true))
                         .andExpect(jsonPath("$.status").value(200))
                         .andExpect(jsonPath("$.data").isArray())
-                        .andExpect(jsonPath("$.data[*].keyword").exists())
-                        .andExpect(jsonPath("$.data[*].totalCount").exists())
+                        .andExpect(jsonPath("$.data[*].title").exists())
+                        .andExpect(jsonPath("$.data[*].address").exists())
                 ;
     }
 }

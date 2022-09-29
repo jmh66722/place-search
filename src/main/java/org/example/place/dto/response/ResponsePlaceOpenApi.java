@@ -28,6 +28,8 @@ public class ResponsePlaceOpenApi {
     @Setter
     @Builder
     @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Document{
         @JsonAlias({"place_name","title"})
         private String title;
