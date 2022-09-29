@@ -25,13 +25,13 @@ class KeywordStatisticsSchedulerTest {
     @Test
     void keywordStatisticsAggregation_test() {
         List<KeywordStatistics> before = jdbcTemplate.query(
-                        String.format("SELECT * FROM KEYWORD_STATISTICS"),
-                        (rs, rowNum) ->
-                                KeywordStatistics.builder()
-                                    .keyword(rs.getString("KEYWORD"))
-                                    .totalCount(rs.getInt("TOTAL_COUNT"))
-                                    .build()
-                );
+                String.format("SELECT * FROM KEYWORD_STATISTICS"),
+                (rs, rowNum) ->
+                        KeywordStatistics.builder()
+                            .keyword(rs.getString("KEYWORD"))
+                            .totalCount(rs.getInt("TOTAL_COUNT"))
+                            .build()
+        );
 
         statisticsScheduler.keywordStatisticsAggregation();
 
