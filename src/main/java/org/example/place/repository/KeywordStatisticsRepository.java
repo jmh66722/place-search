@@ -17,5 +17,4 @@ public interface KeywordStatisticsRepository extends JpaRepository<KeywordStatis
             "from KEYWORD_STATISTICS e " +
             "order by e.totalCount desc")
     List<ResponseKeyword> findDtoByPage(Pageable pageable);
-
 }

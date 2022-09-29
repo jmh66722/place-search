@@ -47,6 +47,9 @@ dependencies{
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     // H2
     implementation "com.h2database:h2"
+    // Scheduled lock, db 연결을 위한 provider
+    implementation "net.javacrumbs.shedlock:shedlock-spring:4.42.0"
+    implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.42.0"
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'

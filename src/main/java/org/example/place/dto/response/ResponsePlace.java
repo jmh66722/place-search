@@ -15,4 +15,7 @@ public class ResponsePlace {
 
     @Schema(description = "장소명")
     private String title;
+
+    @Schema(description = "주소")
+    private String address;
 }

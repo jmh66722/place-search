@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 public class CommonErrorController implements ErrorController {
 
     @RequestMapping("/error")
-    public void error(HttpServletRequest request) {
+    public void error(HttpServletRequest request) throws Exception {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 
         if(status != null) {
@@ -26,6 +26,11 @@ public class CommonErrorController implements ErrorController {
             if(statusCode == HttpStatus.NOT_FOUND.value()) {
                 throw new NotFoundException("Not found request mapping");
             }
+            if(statusCode ==  HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+                throw new Exception(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+            }
+        }else{
+            throw new Exception(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         }
     }
 }
