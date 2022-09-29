@@ -1,5 +1,6 @@
 package org.example.place.service.v1;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -9,12 +10,12 @@ import org.example.place.component.NaverApi;
 import org.example.place.dto.response.ResponsePlace;
 import org.example.place.dto.response.ResponsePlaceOpenApi;
 import org.example.place.entity.SearchHistory;
-import org.example.place.repository.KeywordStatisticsRepository;
 import org.example.place.repository.SearchHistoryRepository;
 import org.example.place.service.PlaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -25,15 +26,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class PlaceServiceImpl implements PlaceService {
-
-    private final KeywordStatisticsRepository keywordStatisticsRepository;
     private final SearchHistoryRepository searchHistoryRepository;
     private final KakaoApi kakaoApi;
     private final NaverApi naverApi;
 
     @Autowired
-    public PlaceServiceImpl(KeywordStatisticsRepository keywordStatisticsRepository, SearchHistoryRepository searchHistoryRepository, KakaoApi kakaoApi, NaverApi naverApi) {
-        this.keywordStatisticsRepository = keywordStatisticsRepository;
+    public PlaceServiceImpl(SearchHistoryRepository searchHistoryRepository, KakaoApi kakaoApi, NaverApi naverApi) {
         this.searchHistoryRepository = searchHistoryRepository;
         this.kakaoApi = kakaoApi;
         this.naverApi = naverApi;
@@ -55,7 +53,7 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
 
-    private List<ResponsePlace> getPlacesByKeywordFromApis(String keyword, LocalOpenApi...apis) {
+    private List<ResponsePlace> getPlacesByKeywordFromApis(String keyword, LocalOpenApi...apis) throws HttpClientErrorException, JsonProcessingException {
         int page = 1;
         int pageSize = 5;
         int targetSize = pageSize * apis.length;
@@ -69,9 +67,11 @@ public class PlaceServiceImpl implements PlaceService {
             List<ResponsePlaceOpenApi.Document> documents = new ArrayList<>();
             try {
                 documents.addAll(apis[i].getLocalByKeyword(keyword, PageRequest.of(page,pageSize), ResponsePlaceOpenApi.class).getDocuments());
-            } catch (Exception e){
-                //api호출에 문제가 생겼을 경우
-                log.error(e.getMessage());
+            } catch (HttpClientErrorException e){
+                //외부 api호출에 문제가 생겼을 경우, 이전 이력에서 조회, 이마저도 실패하면 에러 리턴
+                String result = searchHistoryRepository.findTopByKeywordOrderByIdDesc(keyword).orElseThrow(() -> e).getResult();
+
+                return new ObjectMapper().readValue(result, List.class);
             }
             mergeArguments[i] = documents;
 

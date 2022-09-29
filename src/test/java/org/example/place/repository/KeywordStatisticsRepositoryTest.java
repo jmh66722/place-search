@@ -28,7 +28,7 @@ class KeywordStatisticsRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1,5,10})
-    void findDtoTopTest(int size) {
+    void findDtoTop_test(int size) {
         System.out.println("count :" +repository.count());
 
         List<ResponseKeyword> keywords = repository.findDtoByPage(PageRequest.of(0,size));
@@ -37,8 +37,8 @@ class KeywordStatisticsRepositoryTest {
     }
 
     @ParameterizedTest
-    @MethodSource("statisticsAggregationParams")
-    void statisticsAggregationTest(String keyword, int count) {
+    @MethodSource("statisticsAggregation_params")
+    void statisticsAggregation_test(String keyword, int count) {
         KeywordStatistics before = repository.getById(keyword);
 
         int expectedCount = before.getTotalCount() + count;
@@ -61,7 +61,7 @@ class KeywordStatisticsRepositoryTest {
 
     }
     //statisticsAggregation 테스트 파라미터
-    private static Stream<Arguments> statisticsAggregationParams() {
+    private static Stream<Arguments> statisticsAggregation_params() {
         return Stream.of(
                 Arguments.of("맛집",10),
                 Arguments.of("카페",20)

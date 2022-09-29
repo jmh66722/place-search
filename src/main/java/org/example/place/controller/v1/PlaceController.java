@@ -36,7 +36,7 @@ public class PlaceController {
             @ApiResponse(responseCode = "500", description = "알 수 없는 오류", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class))))
     })
     public CommonApiResponse getPlacesByKeyword(
-            @RequestParam("q") String keyword
+            @RequestParam("query") String keyword
     ) {
         return new SingleResponse(service.getPlacesByKeyword(keyword));
     }

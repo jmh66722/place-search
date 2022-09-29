@@ -70,8 +70,12 @@ springdoc:
   packages-to-exclude:
     - org.example.common
 
-schedlock:
-  table: schedlock
+scheduler:
+  statistics:
+    cron: "*/10 * * * * *"
+
+#schedlock:
+#  table: schedlock
 
 kakao:
   api:

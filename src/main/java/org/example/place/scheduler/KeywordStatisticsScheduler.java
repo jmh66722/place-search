@@ -1,5 +1,6 @@
 package org.example.place.scheduler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.place.entity.KeywordStatistics;
 import org.example.place.repository.KeywordStatisticsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Slf4j
 @Component
 public class KeywordStatisticsScheduler {
 
@@ -21,9 +23,10 @@ public class KeywordStatisticsScheduler {
         this.keywordStatisticsRepository = keywordStatisticsRepository;
     }
 
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "${scheduler.statistics.cron}")
 //    @SchedulerLock(name = "keywordStatisticsCounting" , lockAtLeastFor = "10s", lockAtMostFor = "20s")
     public void keywordStatisticsAggregation(){
+        log.info("Start Statistics Aggregation");
 
         // keyword 로 기록된 값을 가져온다.
         List<KeywordStatistics> list = jdbcTemplate.query(

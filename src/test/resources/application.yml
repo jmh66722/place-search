@@ -17,6 +17,10 @@ logging:
     org.example.service.*: debug
     org.hibernate.type.descriptor.sql: trace
 
+scheduler:
+  statistics:
+    cron: "*/10 * * * * *"
+
 kakao:
   api:
     host: https://dapi.kakao.com

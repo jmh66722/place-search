@@ -27,7 +27,7 @@ class KeywordServiceImplTest {
     }
 
     @Test
-    void getPopularKeywords() {
+    void getPopularKeywords_test() {
         List<ResponseKeyword> result = service.getPopularKeywords();
 
         Assertions.assertTrue(result.size() > 0);

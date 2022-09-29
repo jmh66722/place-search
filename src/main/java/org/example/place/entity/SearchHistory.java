@@ -14,7 +14,8 @@ import java.time.Instant;
 @Setter
 @Builder
 @ToString
-@Entity(name = "SEARCH_HISTORY")
+@Entity
+@Table(name = "SEARCH_HISTORY", indexes = @Index(name = "idx_keyword", columnList = "keyword"))
 @EntityListeners(AuditingEntityListener.class)
 public class SearchHistory {
 

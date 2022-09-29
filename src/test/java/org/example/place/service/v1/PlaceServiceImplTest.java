@@ -8,21 +8,26 @@ import org.example.place.component.NaverApi;
 import org.example.place.dto.response.ResponsePlace;
 import org.example.place.dto.response.ResponsePlaceOpenApi;
 import org.example.place.entity.SearchHistory;
+import org.example.place.repository.SearchHistoryRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,13 +52,16 @@ class PlaceServiceImplTest {
     @MockBean
     private NaverApi naverApi;
 
+    @MockBean
+    private SearchHistoryRepository searchHistoryRepository;
+
     private ObjectMapper mapper = new ObjectMapper();
 
 
 
     @ParameterizedTest
-    @MethodSource("mergeDocumentsParams")
-    void mergeDocumentsTest(List<ResponsePlaceOpenApi.Document> kakaoDocs, List<ResponsePlaceOpenApi.Document> naverDocs, List<ResponsePlace> expected) throws JsonProcessingException {
+    @MethodSource("mergeDocuments_params")
+    void mergeDocuments_test(List<ResponsePlaceOpenApi.Document> kakaoDocs, List<ResponsePlaceOpenApi.Document> naverDocs, List<ResponsePlace> expected) throws JsonProcessingException {
         List<ResponsePlace> result = ReflectionTestUtils.invokeMethod(service,"mergeDocuments",10, new List[]{kakaoDocs, naverDocs});
 
         Assertions.assertNotNull(result);
@@ -61,8 +69,8 @@ class PlaceServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("mergeDocumentsParams")
-    void getPlacesByKeywordFromApisTest(List<ResponsePlaceOpenApi.Document> kakaoDocs, List<ResponsePlaceOpenApi.Document> naverDocs, List<ResponsePlace> expected) throws JsonProcessingException {
+    @MethodSource("mergeDocuments_params")
+    void getPlacesByKeywordFromApis_test(List<ResponsePlaceOpenApi.Document> kakaoDocs, List<ResponsePlaceOpenApi.Document> naverDocs, List<ResponsePlace> expected) throws JsonProcessingException {
         //mockito when
         when(kakaoApi.getLocalByKeyword("", PageRequest.of(1,5), ResponsePlaceOpenApi.class))
                 .thenReturn(ResponsePlaceOpenApi.builder().documents(kakaoDocs).build());
@@ -81,8 +89,8 @@ class PlaceServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("mergeDocumentsParams")
-    void getPlacesByKeywordTest(List<ResponsePlaceOpenApi.Document> kakaoDocs, List<ResponsePlaceOpenApi.Document> naverDocs, List<ResponsePlace> expected) throws JsonProcessingException {
+    @MethodSource("mergeDocuments_params")
+    void getPlacesByKeyword_test(List<ResponsePlaceOpenApi.Document> kakaoDocs, List<ResponsePlaceOpenApi.Document> naverDocs, List<ResponsePlace> expected) throws JsonProcessingException {
         //mockito when
         when(kakaoApi.getLocalByKeyword("", PageRequest.of(1,5), ResponsePlaceOpenApi.class))
                 .thenReturn(ResponsePlaceOpenApi.builder().documents(kakaoDocs).build());
@@ -112,8 +120,50 @@ class PlaceServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("mergeDocumentsParams")
-    void 동시성테스트(List<ResponsePlaceOpenApi.Document> kakaoDocs, List<ResponsePlaceOpenApi.Document> naverDocs, List<ResponsePlace> expected) throws InterruptedException {
+    @ValueSource(strings = {"맛집","카페"})
+    void getPlacesByKeyword_failureCallApis_test(String keyword) {
+        //mockito when
+        when(kakaoApi.getLocalByKeyword(keyword, PageRequest.of(1,5), ResponsePlaceOpenApi.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(kakaoApi.getLocalByKeyword(keyword, PageRequest.of(2,5), ResponsePlaceOpenApi.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(naverApi.getLocalByKeyword(keyword, PageRequest.of(1,5), ResponsePlaceOpenApi.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(naverApi.getLocalByKeyword(keyword, PageRequest.of(2,5), ResponsePlaceOpenApi.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        when(searchHistoryRepository.findTopByKeywordOrderByIdDesc(keyword))
+                .thenReturn(Optional.of(SearchHistory.builder().result("[{}]").build()));
+
+        List<ResponsePlace> result = service.getPlacesByKeyword(keyword);
+
+        //then
+        Assertions.assertNotNull(result);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"맛집","카페","fail"})
+    void getPlacesByKeyword_failureQuery_test(String keyword) {
+        //mockito when
+        when(kakaoApi.getLocalByKeyword(keyword, PageRequest.of(1,5), ResponsePlaceOpenApi.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(kakaoApi.getLocalByKeyword(keyword, PageRequest.of(2,5), ResponsePlaceOpenApi.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(naverApi.getLocalByKeyword(keyword, PageRequest.of(1,5), ResponsePlaceOpenApi.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(naverApi.getLocalByKeyword(keyword, PageRequest.of(2,5), ResponsePlaceOpenApi.class))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        when(searchHistoryRepository.findTopByKeywordOrderByIdDesc(keyword))
+                .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        //then
+        Assertions.assertThrows(HttpClientErrorException.class, () -> service.getPlacesByKeyword(keyword));
+    }
+
+    @ParameterizedTest
+    @MethodSource("mergeDocuments_params")
+    void 동시성_테스트(List<ResponsePlaceOpenApi.Document> kakaoDocs, List<ResponsePlaceOpenApi.Document> naverDocs, List<ResponsePlace> expected) throws InterruptedException {
         //mockito when
         when(kakaoApi.getLocalByKeyword("", PageRequest.of(1,5), ResponsePlaceOpenApi.class))
                 .thenReturn(ResponsePlaceOpenApi.builder().documents(kakaoDocs).build());
@@ -154,7 +204,7 @@ class PlaceServiceImplTest {
 
     }
     //mergeDocuments 테스트 파라미터
-    private static Stream<Arguments> mergeDocumentsParams() {
+    private static Stream<Arguments> mergeDocuments_params() {
         return Stream.of(
                 // 중복된 은행 2개가 우선, 입력된 arguments 순서대로 우선순위가 맞는지 확인
                 Arguments.of(

@@ -16,7 +16,7 @@ class KakaoApiTest {
     private KakaoApi kakaoApi;
 
     @Test
-    void getLocalByKeyword() {
+    void getLocalByKeyword_test() {
         ResponsePlaceOpenApi result = kakaoApi.getLocalByKeyword("은행", ResponsePlaceOpenApi.class);
         Assertions.assertNotNull(result);
 
