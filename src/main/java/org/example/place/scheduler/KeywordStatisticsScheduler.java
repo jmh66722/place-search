@@ -1,29 +1,41 @@
 package org.example.place.scheduler;
 
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.example.place.entity.KeywordStatistics;
 import org.example.place.repository.KeywordStatisticsRepository;
-import org.example.place.repository.SearchHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class KeywordStatisticsScheduler {
 
-    private final SearchHistoryRepository searchHistoryRepository;
+    private final JdbcTemplate jdbcTemplate;
     private final KeywordStatisticsRepository keywordStatisticsRepository;
 
     @Autowired
-    public KeywordStatisticsScheduler(SearchHistoryRepository searchHistoryRepository, KeywordStatisticsRepository keywordStatisticsRepository) {
-        this.searchHistoryRepository = searchHistoryRepository;
+    public KeywordStatisticsScheduler(JdbcTemplate jdbcTemplate, KeywordStatisticsRepository keywordStatisticsRepository) {
+        this.jdbcTemplate = jdbcTemplate;
         this.keywordStatisticsRepository = keywordStatisticsRepository;
     }
 
-    @Scheduled(cron = "*/10 * * * *")
-    @SchedulerLock(name = "keywordStatisticsCounting" , lockAtLeastFor = "10s", lockAtMostFor = "20s")
+    @Scheduled(cron = "*/10 * * * * *")
+//    @SchedulerLock(name = "keywordStatisticsCounting" , lockAtLeastFor = "10s", lockAtMostFor = "20s")
     public void keywordStatisticsAggregation(){
-//        searchHistoryRepository.
 
-//        keywordStatisticsRepository.statisticsAggregation();
+        // keyword 로 기록된 값을 가져온다.
+        List<KeywordStatistics> list = jdbcTemplate.query(
+                "SELECT KEYWORD, COUNT(*) AS TOTAL_COUNT FROM SEARCH_HISTORY GROUP BY KEYWORD",
+                (rs, rowNum) -> KeywordStatistics.builder()
+                        .keyword(rs.getString("KEYWORD"))
+                        .totalCount(rs.getInt("TOTAL_COUNT"))
+                        .build()
+        );
+
+        //집계된 값을 저장
+        keywordStatisticsRepository.saveAll(list);
+
     }
 }

@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SearchHistoryRepository extends JpaRepository<SearchHistory,Integer> {
-
 }

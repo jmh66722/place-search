@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -18,6 +19,9 @@ import java.util.stream.Stream;
 @DataJpaTest
 @Sql({"classpath:/schema.sql", "classpath:/data.sql"})
 class KeywordStatisticsRepositoryTest {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private KeywordStatisticsRepository repository;
@@ -33,24 +37,31 @@ class KeywordStatisticsRepositoryTest {
     }
 
     @ParameterizedTest
-    @MethodSource("saveParams")
-    void saveTest(String keyword, int count) {
+    @MethodSource("statisticsAggregationParams")
+    void statisticsAggregationTest(String keyword, int count) {
         KeywordStatistics before = repository.getById(keyword);
 
-        int newCount = before.getTotalCount() + count;
-        repository.save(KeywordStatistics.builder()
-                .keyword(keyword)
-                .totalCount(newCount)
-                .build());
+        int expectedCount = before.getTotalCount() + count;
+        int c = repository.statisticsAggregation(keyword,count);
 
-        KeywordStatistics after = repository.getById(keyword);
+        Assertions.assertTrue(c > 0);
+
+        KeywordStatistics after = jdbcTemplate.queryForObject(
+                String.format("SELECT * FROM KEYWORD_STATISTICS WHERE KEYWORD = '%s'",keyword),
+                (rs, rowNum) ->
+                        KeywordStatistics.builder()
+                            .keyword(rs.getString("KEYWORD"))
+                            .totalCount(rs.getInt("TOTAL_COUNT"))
+                            .build()
+        );
+
 
         Assertions.assertNotNull(after);
-        Assertions.assertEquals(newCount , after.getTotalCount());
+        Assertions.assertEquals(expectedCount , after.getTotalCount());
 
     }
-    //save 테스트 파라미터
-    private static Stream<Arguments> saveParams() {
+    //statisticsAggregation 테스트 파라미터
+    private static Stream<Arguments> statisticsAggregationParams() {
         return Stream.of(
                 Arguments.of("맛집",10),
                 Arguments.of("카페",20)

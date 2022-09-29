@@ -10,7 +10,7 @@ public interface KeywordService {
     /**
     * 검색 순위가 높은 키워드 조회
     * @param {int} limit
-    * @return {@link List<   ResponseKeyword   >}
+    * @return {@link List<    ResponseKeyword    >}
     * */
     List<ResponseKeyword> getPopularKeywords();
 }
